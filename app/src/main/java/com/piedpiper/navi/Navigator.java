@@ -2,9 +2,11 @@ package com.piedpiper.navi;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+
 import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,7 +49,7 @@ class Navigator {
     /**
      * Get the routes information from origin to destination
      *
-     * @param origin: origin location
+     * @param origin : origin location
      */
     void getRoute(Location origin, String destinationId) {
         // empty destination?
