@@ -11,7 +11,11 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            buildConfigField 'String', "API_KEY", API_KEY
+        }
         release {
+            buildConfigField 'String', "API_KEY", API_KEY
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -29,6 +33,7 @@ dependencies {
     implementation 'com.google.ar:core:1.6.0'
     implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.6.0'
     implementation 'com.google.android.gms:play-services-location:16.0.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
