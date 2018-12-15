@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -31,6 +30,8 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.ar.sceneform.ux.ArFragment;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -43,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements MainCallback{
     private static final int MIN_UPDATE_DISTANCE = 1;
 
     private Boolean requestingLocationUpdates;
-    private Boolean navigationStarted;
     private Handler handler;
     private RendererRunnable rendererRunnable;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -54,7 +54,6 @@ public class MainActivity extends AppCompatActivity implements MainCallback{
     private ImageView startButton;
     private ArrayAdapter<String> PlaceAdapter;
 
-    private Boolean startPressed;
     private String destinationPlaceId;
     private Navigator navigator;
 
@@ -69,11 +68,9 @@ public class MainActivity extends AppCompatActivity implements MainCallback{
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
         // initialize fragment
-        ArFragment arFragment = (ArFragment)
-                getSupportFragmentManager().findFragmentById(R.id.ar_fragment);
+        ArFragment arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ar_fragment);
 
         requestingLocationUpdates = false;
-        navigationStarted = false;
         createLocationRequest();
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         destinationPlaceId="";
@@ -107,7 +104,6 @@ public class MainActivity extends AppCompatActivity implements MainCallback{
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d(TAG, "onTextChange called");
                 navigator.getPrediction(s.toString());
             }
 
@@ -216,13 +212,16 @@ public class MainActivity extends AppCompatActivity implements MainCallback{
         if (view == null) {
             view = new View(this);
         }
+        assert imm != null;
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
 
     @Override
     public void onRoute(JSONObject jsonObject) {
-        Log.d(TAG, "Routes received: " + jsonObject.toString());
+        RouteParser routeParser = new RouteParser(jsonObject);
+
+
     }
 
     @Override
