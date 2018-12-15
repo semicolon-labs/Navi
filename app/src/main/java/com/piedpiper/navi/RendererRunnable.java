@@ -23,25 +23,15 @@ import com.google.ar.sceneform.ux.TransformableNode;
 
 import java.util.List;
 
-public class RendererRunnable implements Runnable{
-    private static final int UPDATE_PERIOD_MS = 1000;
+public class RendererRunnable{
 
     private Context context;
     private ArFragment arFragment;
-    private Handler handler;
     private final String TAG = RendererRunnable.class.getSimpleName();
 
-    RendererRunnable(Context context, Handler handler, ArFragment arFragment) {
+    RendererRunnable(Context context, ArFragment arFragment) {
         this.context = context;
         this.arFragment = arFragment;
-        this.handler = handler;
-    }
-
-    @Override
-    public void run() {
-        Log.d(TAG, "Adding object");
-        addObject(Uri.parse("andy.sfb"));
-        this.handler.postDelayed(this, UPDATE_PERIOD_MS);
     }
 
     /**
