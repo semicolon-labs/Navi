@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.net.Uri;
-import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -24,6 +23,12 @@ import com.google.ar.sceneform.ux.TransformableNode;
 import java.util.List;
 
 public class RendererRunnable{
+
+    public static final Uri ARROW_STRAIGHT = Uri.parse("arrow_straight.sfb");
+    public static final Uri ARROW_LEFT = Uri.parse("arrow_left.sfb");
+    public static final Uri ARROW_RIGHT = Uri.parse("arrow_right.sfb");
+    public static final Uri ARROW_UTURN = Uri.parse("arrow_uturn.sfb");
+    public static final Uri ANDROID = Uri.parse("andy.sfb");
 
     private Context context;
     private ArFragment arFragment;

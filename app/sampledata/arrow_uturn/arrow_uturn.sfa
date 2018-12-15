@@ -1,0 +1,41 @@
+{
+  materials: [
+    {
+      name: 'color_14541540',
+      parameters: [
+        {
+          baseColor: null,
+        },
+        {
+          baseColorTint: [
+            0.86666699999999997,
+            0.88627500000000003,
+            0.89411799999999997,
+            1,
+          ],
+        },
+        {
+          metallic: 0,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+    },
+  ],
+  model: {
+    attributes: [
+      'Position',
+      'Orientation',
+    ],
+    collision: {},
+    file: 'sampledata/arrow_uturn/arrow_uturn.obj',
+    name: 'arrow_uturn',
+    recenter: 'root',
+  },
+  version: '0.54:1',
+}

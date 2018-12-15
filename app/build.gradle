@@ -35,3 +35,23 @@ dependencies {
 }
 
 apply plugin: 'com.google.ar.sceneform.plugin'
+
+sceneform.asset('sampledata/arrow_left/arrow_left.obj',
+        'default',
+        'sampledata/arrow_left/arrow_left.sfa',
+        'src/main/assets/arrow_left')
+
+sceneform.asset('sampledata/arrow_right/arrow_right.obj',
+        'default',
+        'sampledata/arrow_right/arrow_right.sfa',
+        'src/main/assets/arrow_right')
+
+sceneform.asset('sampledata/arrow_straight/arrow_straight.obj',
+        'default',
+        'sampledata/arrow_straight/arrow_straight.sfa',
+        'src/main/assets/arrow_straight')
+
+sceneform.asset('sampledata/arrow_uturn/arrow_uturn.obj',
+        'default',
+        'sampledata/arrow_uturn/arrow_uturn.sfa',
+        'src/main/assets/arrow_uturn')
