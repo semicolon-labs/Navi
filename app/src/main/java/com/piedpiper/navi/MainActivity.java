@@ -5,10 +5,12 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -18,13 +20,19 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.ar.sceneform.ux.ArFragment;
 
-public class MainActivity extends AppCompatActivity {
+import org.json.JSONObject;
+
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements MainCallback{
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final double MIN_OPEN_GL_VERSION = 3.0;
     private static final int MIN_UPDATE_DISTANCE = 1;
 
     private Boolean requestingLocationUpdates;
+    private Boolean navigationStarted;
+    private Handler handler;
     private RendererRunnable rendererRunnable;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private LocationRequest locationRequest;
@@ -43,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
                 getSupportFragmentManager().findFragmentById(R.id.ar_fragment);
 
         requestingLocationUpdates = false;
+        navigationStarted = false;
         createLocationRequest();
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         locationCallback = new LocationCallback() {
@@ -54,8 +63,9 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         startLocationUpdates();
-        rendererRunnable = new RendererRunnable(this, arFragment);
-
+        handler = new Handler();
+        rendererRunnable = new RendererRunnable(this, handler, arFragment);
+        startRendering();
     }
 
     @Override
@@ -91,6 +101,13 @@ public class MainActivity extends AppCompatActivity {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
     }
 
+    private void startRendering(){
+        handler.post(rendererRunnable);
+    }
+
+    private void stopRendering(){
+        handler.removeCallbacks(rendererRunnable);
+    }
     /**
      * Check if device is AR ready!
      */
@@ -111,4 +128,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onPrediction(List<String> places, List<String> places_id) {
+
+    }
+
+    @Override
+    public void onRoute(JSONObject jsonObject) {
+
+    }
+
+    @Override
+    public void onCalibrated() {
+        findViewById(R.id.splash_view).setVisibility(View.GONE);
+    }
 }

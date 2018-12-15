@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.net.Uri;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -22,7 +23,7 @@ import com.google.ar.sceneform.ux.TransformableNode;
 
 import java.util.List;
 
-public class RendererRunnable{
+public class RendererRunnable implements Runnable{
 
     public static final Uri ARROW_STRAIGHT = Uri.parse("arrow_straight.sfb");
     public static final Uri ARROW_LEFT = Uri.parse("arrow_left.sfb");
@@ -30,13 +31,20 @@ public class RendererRunnable{
     public static final Uri ARROW_UTURN = Uri.parse("arrow_uturn.sfb");
     public static final Uri ANDROID = Uri.parse("andy.sfb");
 
-    private Context context;
-    private ArFragment arFragment;
     private final String TAG = RendererRunnable.class.getSimpleName();
 
-    RendererRunnable(Context context, ArFragment arFragment) {
+    private Context context;
+    private Handler handler;
+    private ArFragment arFragment;
+    private Boolean activityCalibrated;
+    private MainCallback mainCallback;
+
+    RendererRunnable(Context context, Handler handler, ArFragment arFragment) {
         this.context = context;
+        this.handler = handler;
         this.arFragment = arFragment;
+        activityCalibrated = false;
+        mainCallback = (MainCallback) context;
     }
 
     /**
@@ -53,6 +61,10 @@ public class RendererRunnable{
                     Trackable trackable = hitResult.getTrackable();
                     if ((trackable instanceof Plane &&
                             ((Plane) trackable).isPoseInPolygon(hitResult.getHitPose()))) {
+                        if (!activityCalibrated){
+                            activityCalibrated = true;
+                            this.mainCallback.onCalibrated();
+                        }
                         placeObject(hitResult.createAnchor(), objectUri);
                         break;
                     }
@@ -103,4 +115,9 @@ public class RendererRunnable{
         return new android.graphics.Point(view.getWidth() / 2, view.getHeight() / 2);
     }
 
+    @Override
+    public void run() {
+        addObject(RendererRunnable.ANDROID);
+        handler.postDelayed(this, 1000);
+    }
 }
