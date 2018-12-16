@@ -1,0 +1,41 @@
+{
+  materials: [
+    {
+      name: 'color_11593967',
+      parameters: [
+        {
+          baseColor: null,
+        },
+        {
+          baseColorTint: [
+            0.69019600000000003,
+            0.90980399999999995,
+            0.93725499999999995,
+            1,
+          ],
+        },
+        {
+          metallic: 0,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+    },
+  ],
+  model: {
+    attributes: [
+      'Position',
+      'Orientation',
+    ],
+    collision: {},
+    file: 'sampledata/arrow_left/arrow_left.obj',
+    name: 'arrow_left',
+    recenter: 'root',
+  },
+  version: '0.54:1',
+}
