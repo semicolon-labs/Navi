@@ -30,8 +30,6 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.ar.sceneform.ux.ArFragment;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -43,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements MainCallback {
     private static final double MIN_OPEN_GL_VERSION = 3.0;
     private static final int MIN_UPDATE_DISTANCE = 1;
 
+    private int autoCompleteTextViewLocation[];
     private Boolean requestingLocationUpdates;
     private Handler handler;
     private RendererRunnable rendererRunnable;
@@ -69,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements MainCallback {
         setContentView(R.layout.activity_main);
         // initialize fragment
         ArFragment arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ar_fragment);
-
+        autoCompleteTextViewLocation = new int[2];
         requestingLocationUpdates = false;
         createLocationRequest();
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -96,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements MainCallback {
          */
 
         autoCompleteTextView = findViewById(R.id.autoCompleteMaps);
+        autoCompleteTextView.getLocationOnScreen(autoCompleteTextViewLocation);
         autoCompleteTextView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -237,34 +237,46 @@ public class MainActivity extends AppCompatActivity implements MainCallback {
         view.startAnimation(buttonAnimation);
         view.setVisibility(View.GONE);
         // AutoCompleteTextView
-        int actvLoc[] = new int[2];
-        autoCompleteTextView.getLocationOnScreen(actvLoc);
-        autoCompleteTextView.animate().translationYBy(-actvLoc[1]).translationXBy(actvLoc[0]).alpha(0.5f).setDuration(700).withEndAction(new Runnable() {
+        autoCompleteTextView.animate().translationYBy(-autoCompleteTextViewLocation[1]).translationXBy(autoCompleteTextViewLocation[0]).alpha(0.5f).setDuration(700).withEndAction(new Runnable() {
             @Override
             public void run() {
-                String strtemp = autoCompleteTextView.getText().toString();
-                int commaCount = 0;
-                int i;
-                for (i = 0; i < strtemp.length(); i++) {
-                    if (strtemp.charAt(i) == ',') {
+                String str_temp = autoCompleteTextView.getText().toString();
+                int commaCount = 0, i;
+                for (i = 0; i < str_temp.length(); i++) {
+                    if (str_temp.charAt(i) == ',')
                         commaCount++;
-                    }
-
-                    if (commaCount == 3) {
+                    if (commaCount == 3)
                         break;
-                    }
 
                 }
-
-                ((TextView) findViewById(R.id.destination_text_view)).setText(strtemp.substring(0, i));
+                ((TextView) findViewById(R.id.destination_text_view)).setText(str_temp.substring(0, i));
 
                 autoCompleteTextView.setVisibility(View.GONE);
+                findViewById(R.id.linear_layout_top).setVisibility(View.VISIBLE);
             }
         });
-        findViewById(R.id.linear_layout_top).setVisibility(View.VISIBLE);
 
         requestingLocationUpdates = true;
         startLocationUpdates();
         stopRendering();
+    }
+
+    public void backButtonOnClick(View view) {
+        // return things to where they were
+        autoCompleteTextView.animate().translationYBy(autoCompleteTextViewLocation[1]).translationXBy(-autoCompleteTextViewLocation[0]).alpha(1f);
+        // draw stuff
+        findViewById(R.id.linear_layout_top).setVisibility(View.GONE);
+        autoCompleteTextView.setVisibility(View.VISIBLE);
+        autoCompleteTextView.getParent().requestChildFocus(autoCompleteTextView, autoCompleteTextView);
+        findViewById(R.id.start_button).setVisibility(View.VISIBLE);
+
+        requestingLocationUpdates = false;
+        stopLocationUpdates();
+        startRendering();
+    }
+
+    @Override
+    public void onBackPressed() {
+
     }
 }
