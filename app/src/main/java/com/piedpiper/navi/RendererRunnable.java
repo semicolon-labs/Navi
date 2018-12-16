@@ -51,7 +51,7 @@ public class RendererRunnable implements Runnable{
      * Try to get the plane in front and test a hit
      * Add the object if hit is successful
      */
-    private void addObject(Uri objectUri) {
+    public void addObject(Uri objectUri) {
         Frame frame = arFragment.getArSceneView().getArFrame();
         Point point = getScreenCenter();
         if (frame != null) {

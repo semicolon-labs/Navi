@@ -1,13 +1,19 @@
 package com.piedpiper.navi;
 
+import android.content.Context;
 import android.net.Uri;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class RouteParser {
+
     private JSONObject legs;
-    RouteParser(JSONObject jsonObject){
+    private Context context;
+
+    RouteParser(Context context, JSONObject jsonObject){
+        this.context = context;
         try {
             this.legs = jsonObject.getJSONArray("routes").getJSONObject(0).getJSONArray("legs").getJSONObject(0);
         } catch (JSONException e) {
@@ -35,7 +41,8 @@ public class RouteParser {
     public Uri getArrowUri(){
         String maneuver = "";
         try {
-            maneuver = legs.getJSONArray("steps").getJSONObject(0).getString("maneuver");
+            Toast.makeText(this.context, legs.getJSONArray("steps").getJSONObject(0).getString("maneuver"), Toast.LENGTH_SHORT).show();
+            maneuver = legs.getJSONArray("steps").getJSONObject(1).getString("maneuver");
         } catch (JSONException e){
             // ignore
         }

@@ -87,4 +87,38 @@
         android:background="#80000000"
         android:src="@drawable/splash" />
 
+    <LinearLayout
+        android:id="@+id/linear_layout_bottom"
+        android:visibility="invisible"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:alpha="0.5"
+        android:layout_alignParentBottom="true">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical|center_horizontal"
+            android:textFontWeight="bold"
+            android:textColor="@color/colorPrimary"
+            android:id="@+id/text_duration"
+            android:textSize="21sp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical|center_horizontal"
+            android:textFontWeight="bold"
+            android:textColor="@color/colorPrimary"
+            android:id="@+id/text_distance"
+            android:textSize="21sp"
+            />
+
+    </LinearLayout>
+
 </RelativeLayout>

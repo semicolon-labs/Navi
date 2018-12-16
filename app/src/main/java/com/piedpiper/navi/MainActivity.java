@@ -78,7 +78,6 @@ public class MainActivity extends AppCompatActivity implements MainCallback {
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
                 Log.d(TAG, "result: " + locationResult.toString());
-                Toast.makeText(MainActivity.this, locationResult.toString(), Toast.LENGTH_SHORT).show();
                 navigator.getRoute(locationResult.getLastLocation(), destinationPlaceId);
             }
         };
@@ -220,8 +219,10 @@ public class MainActivity extends AppCompatActivity implements MainCallback {
 
     @Override
     public void onRoute(JSONObject jsonObject) {
-        RouteParser routeParser = new RouteParser(jsonObject);
-
+        RouteParser routeParser = new RouteParser(this, jsonObject);
+        ((TextView)findViewById(R.id.text_distance)).setText(routeParser.getTotalDistance());
+        ((TextView)findViewById(R.id.text_duration)).setText(routeParser.getTotalTime());
+        rendererRunnable.addObject(routeParser.getArrowUri());
 
     }
 
@@ -231,11 +232,10 @@ public class MainActivity extends AppCompatActivity implements MainCallback {
         findViewById(R.id.autoCompleteMaps).setVisibility(View.VISIBLE);
     }
 
-    public void startButtonOnClick(View view) {
-        // ImageView
+    private void startNavigationMode(){
         Animation buttonAnimation = AnimationUtils.loadAnimation(this, R.anim.button_animation);
-        view.startAnimation(buttonAnimation);
-        view.setVisibility(View.GONE);
+        findViewById(R.id.start_button).startAnimation(buttonAnimation);
+        findViewById(R.id.start_button).setVisibility(View.GONE);
         // AutoCompleteTextView
         autoCompleteTextView.animate().translationYBy(-autoCompleteTextViewLocation[1]).translationXBy(autoCompleteTextViewLocation[0]).alpha(0.5f).setDuration(700).withEndAction(new Runnable() {
             @Override
@@ -250,26 +250,33 @@ public class MainActivity extends AppCompatActivity implements MainCallback {
 
                 }
                 ((TextView) findViewById(R.id.destination_text_view)).setText(str_temp.substring(0, i));
-
                 autoCompleteTextView.setVisibility(View.GONE);
                 findViewById(R.id.linear_layout_top).setVisibility(View.VISIBLE);
+                findViewById(R.id.linear_layout_bottom).setVisibility(View.VISIBLE);
             }
         });
+    }
 
+    private void stopNavigationMode(){
+        // return things to where they were
+        autoCompleteTextView.animate().translationYBy(autoCompleteTextViewLocation[1]).translationXBy(-autoCompleteTextViewLocation[0]).alpha(1f);
+        // draw stuff
+        findViewById(R.id.linear_layout_top).setVisibility(View.GONE);
+        findViewById(R.id.linear_layout_bottom).setVisibility(View.GONE);
+        autoCompleteTextView.setVisibility(View.VISIBLE);
+        autoCompleteTextView.getParent().requestChildFocus(autoCompleteTextView, autoCompleteTextView);
+        findViewById(R.id.start_button).setVisibility(View.VISIBLE);
+    }
+
+    public void startButtonOnClick(View view) {
+        startNavigationMode();
         requestingLocationUpdates = true;
         startLocationUpdates();
         stopRendering();
     }
 
     public void backButtonOnClick(View view) {
-        // return things to where they were
-        autoCompleteTextView.animate().translationYBy(autoCompleteTextViewLocation[1]).translationXBy(-autoCompleteTextViewLocation[0]).alpha(1f);
-        // draw stuff
-        findViewById(R.id.linear_layout_top).setVisibility(View.GONE);
-        autoCompleteTextView.setVisibility(View.VISIBLE);
-        autoCompleteTextView.getParent().requestChildFocus(autoCompleteTextView, autoCompleteTextView);
-        findViewById(R.id.start_button).setVisibility(View.VISIBLE);
-
+        stopNavigationMode();
         requestingLocationUpdates = false;
         stopLocationUpdates();
         startRendering();

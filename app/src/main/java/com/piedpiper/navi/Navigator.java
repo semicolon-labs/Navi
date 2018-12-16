@@ -30,6 +30,7 @@ class Navigator {
     private static final String TAG = "Navigator";
     private static final String ROUTES_URL = "https://maps.googleapis.com/maps/api/directions/json";
     private static final String PLACES_URL = "https://maps.googleapis.com/maps/api/place/autocomplete/json";
+    private static final String DRIVING_MODE = "walking";
 
     private static final int ROUTES_TASK = 0;
     private static final int PLACES_TASK = 1;
@@ -56,8 +57,8 @@ class Navigator {
         // I trust origin since it comes from the GPS service
         if (destinationId.trim().equals(""))
             return;
-        String requestUrl = String.format(Locale.getDefault(), "%s?origin=%f,%f&destination=place_id:%s",
-                ROUTES_URL, origin.getLatitude(), origin.getLongitude(), destinationId);
+        String requestUrl = String.format(Locale.getDefault(), "%s?origin=%f,%f&destination=place_id:%s&mode=%s",
+                ROUTES_URL, origin.getLatitude(), origin.getLongitude(), destinationId, DRIVING_MODE);
         requestUrl = requestUrl.concat(String.format(Locale.getDefault(), "&key=%s", BuildConfig.API_KEY));
         HttpTask httpTask = new HttpTask(ROUTES_TASK);
         httpTask.execute(requestUrl);
