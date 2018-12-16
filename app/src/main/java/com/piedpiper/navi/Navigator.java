@@ -4,8 +4,10 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 
 import org.json.JSONArray;
@@ -30,9 +32,11 @@ class Navigator {
     private static final String TAG = "Navigator";
     private static final String ROUTES_URL = "https://maps.googleapis.com/maps/api/directions/json";
     private static final String PLACES_URL = "https://maps.googleapis.com/maps/api/place/autocomplete/json";
-    private static final String DRIVING_MODE = "walking";
 
-    public static final int DRIVING_MODE_THRESHOLD = 400;
+    public static final int DRIVING_MODE = 0;
+    public static final int WALKING_MODE = 1;
+
+    public static final int DRIVING_MODE_THRESHOLD = 200;
     public static final int WALKING_MODE_THRESHOLD = 10;
 
     private static final int ROUTES_TASK = 0;
@@ -40,6 +44,9 @@ class Navigator {
     public static final int MAX_PLACES_LENGTH = 4;
 
     private MainCallback listener;
+    private Boolean updateRequired;
+    private RouteParser routeParser;
+    private Context context;
 
     /**
      * Navigation constructor
@@ -48,6 +55,9 @@ class Navigator {
      */
     Navigator(Context context) {
         listener = (MainCallback) context;
+        this.context = context;
+        routeParser = new RouteParser();
+        updateRequired = true;
     }
 
     /**
@@ -55,7 +65,85 @@ class Navigator {
      *
      * @param origin : origin location
      */
-    void getRoute(Location origin, String destinationId) {
+    @SuppressLint("DefaultLocale")
+    void getRoute(Location origin, String destinationId, int action) {
+        if (updateRequired){
+            getDirections(origin, destinationId);
+            updateRequired = false;
+            return;
+        }
+        // update is not required!
+        Location nextPoint = routeParser.getNextEndPoint();
+        if (nextPoint == null)
+            return;
+        if(origin.distanceTo(nextPoint) < Navigator.DRIVING_MODE_THRESHOLD
+                && action == Navigator.DRIVING_MODE){
+            updateRequired = true;
+            getRoute(origin, destinationId, action);
+        } else if(origin.distanceTo(nextPoint) < Navigator.WALKING_MODE_THRESHOLD
+                && action == Navigator.WALKING_MODE){
+            updateRequired = true;
+            getRoute(origin, destinationId, action);
+        } else {
+            String totalDistanceString, distanceLeftString, timeLeftString;
+            float distanceLeft = origin.distanceTo(nextPoint);
+            int totalDistance = routeParser.getNextStepDistanceValue();
+            int totalTime = routeParser.getNextStepDurationValue();
+            int timeLeft = (int)(distanceLeft/totalDistance)*totalTime;
+            if (distanceLeft > 500)
+                distanceLeftString = String.format("%.1f", distanceLeft/1000) + " km";
+            else
+                distanceLeftString = Integer.toString((int)distanceLeft) + " m";
+            if (timeLeft > 30)
+                timeLeftString = String.format("%.1f", ((float)timeLeft)/60) + " hours";
+            else
+                timeLeftString = Integer.toString(timeLeft) + " mins";
+            totalDistance = totalDistance - (int)distanceLeft;
+            if (totalDistance > 500)
+                totalDistanceString = String.format("%.1f", ((float)totalDistance)/1000) + " km";
+            else
+                totalDistanceString = Integer.toString((int)totalDistance) + " m";
+
+            Navigator.this.listener.onRoute(totalDistanceString, timeLeftString, distanceLeftString, RendererRunnable.ARROW_STRAIGHT);
+
+        }
+
+    }
+
+    private void transmitRoute(JSONObject jsonObject){
+        routeParser.setLegs(jsonObject);
+        Navigator.this.listener.onRoute(routeParser.getTotalDistance(), routeParser.getTotalTime(), routeParser.getCurrentDistance(), getArrowUri());
+    }
+
+    private Uri getArrowUri() {
+        String maneuver = "";
+        try {
+            int meters = routeParser.getNextStepDistanceValue();
+            if (meters < Navigator.WALKING_MODE_THRESHOLD) {
+                maneuver = routeParser.getLegs().getJSONArray("steps").getJSONObject(1).getString("maneuver");
+            } else {
+                maneuver = "straight";
+            }
+            Log.d(TAG, maneuver);
+            Toast.makeText(this.context, maneuver, Toast.LENGTH_LONG).show();
+        } catch (JSONException e) {
+            // ignore
+        }
+
+        maneuver = (maneuver == null) ? "straight" : maneuver;
+        if (maneuver.equals("straight")) {
+            return RendererRunnable.ARROW_STRAIGHT;
+        } else if (maneuver.contains("left")) {
+            return RendererRunnable.ARROW_LEFT;
+        } else if (maneuver.contains("right")) {
+            return RendererRunnable.ARROW_RIGHT;
+        } else if (maneuver.contains("u-turn")) {
+            return RendererRunnable.ARROW_UTURN;
+        }
+        return RendererRunnable.ARROW_STRAIGHT;
+    }
+
+    private void getDirections(Location origin, String destinationId) {
         // empty destination?
         // I trust origin since it comes from the GPS service
         if (destinationId.trim().equals(""))
@@ -148,7 +236,7 @@ class Navigator {
                 }
                 Navigator.this.listener.onPrediction(places, place_ids);
             } else {
-                Navigator.this.listener.onRoute(jsonObject);
+                transmitRoute(jsonObject);
             }
         }
     }
