@@ -2,12 +2,15 @@ package com.piedpiper.navi;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class RouteParser {
+
+    private static final String TAG = RouteParser.class.getSimpleName();
 
     private JSONObject legs;
     private Context context;
@@ -38,14 +41,30 @@ public class RouteParser {
         }
     }
 
+    public String getCurrentDistance(){
+        try {
+            return legs.getJSONArray("steps").getJSONObject(0).getJSONObject("distance").getString("text");
+        } catch (JSONException e) {
+            return e.toString();
+        }
+    }
+
     public Uri getArrowUri(){
+
         String maneuver = "";
         try {
-            Toast.makeText(this.context, legs.getJSONArray("steps").getJSONObject(0).getString("maneuver"), Toast.LENGTH_SHORT).show();
-            maneuver = legs.getJSONArray("steps").getJSONObject(1).getString("maneuver");
+            int meters = legs.getJSONArray("steps").getJSONObject(0).getJSONObject("distance").getInt("values");
+            if (meters < Navigator.WALKING_MODE_THRESHOLD){
+                maneuver = legs.getJSONArray("steps").getJSONObject(1).getString("maneuver");
+            } else {
+                maneuver = "straight";
+            }
+            Log.d(TAG, maneuver);
+            Toast.makeText(this.context, maneuver, Toast.LENGTH_LONG).show();
         } catch (JSONException e){
             // ignore
         }
+
         maneuver = (maneuver==null)? "straight": maneuver;
         if (maneuver.equals("straight")) {
             return RendererRunnable.ARROW_STRAIGHT;

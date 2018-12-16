@@ -222,6 +222,7 @@ public class MainActivity extends AppCompatActivity implements MainCallback {
         RouteParser routeParser = new RouteParser(this, jsonObject);
         ((TextView)findViewById(R.id.text_distance)).setText(routeParser.getTotalDistance());
         ((TextView)findViewById(R.id.text_duration)).setText(routeParser.getTotalTime());
+        ((TextView)findViewById(R.id.text_curr_distance)).setText(routeParser.getCurrentDistance());
         rendererRunnable.addObject(routeParser.getArrowUri());
 
     }

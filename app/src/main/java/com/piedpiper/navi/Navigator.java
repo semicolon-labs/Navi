@@ -32,6 +32,9 @@ class Navigator {
     private static final String PLACES_URL = "https://maps.googleapis.com/maps/api/place/autocomplete/json";
     private static final String DRIVING_MODE = "walking";
 
+    public static final int DRIVING_MODE_THRESHOLD = 400;
+    public static final int WALKING_MODE_THRESHOLD = 10;
+
     private static final int ROUTES_TASK = 0;
     private static final int PLACES_TASK = 1;
     public static final int MAX_PLACES_LENGTH = 4;
