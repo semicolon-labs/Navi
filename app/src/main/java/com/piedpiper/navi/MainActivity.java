@@ -35,7 +35,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MainCallback{
+public class MainActivity extends AppCompatActivity implements MainCallback {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final double MIN_OPEN_GL_VERSION = 3.0;
@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements MainCallback{
         requestingLocationUpdates = false;
         createLocationRequest();
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        destinationPlaceId="";
+        destinationPlaceId = "";
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -148,17 +148,18 @@ public class MainActivity extends AppCompatActivity implements MainCallback{
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
     }
 
-    private void stopLocationUpdates(){
+    private void stopLocationUpdates() {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
     }
 
-    private void startRendering(){
+    private void startRendering() {
         handler.post(rendererRunnable);
     }
 
-    private void stopRendering(){
+    private void stopRendering() {
         handler.removeCallbacks(rendererRunnable);
     }
+
     /**
      * Check if device is AR ready!
      */
@@ -239,7 +240,17 @@ public class MainActivity extends AppCompatActivity implements MainCallback{
         autoCompleteTextView.animate().translationYBy(-autoCompleteTextViewLocation[1]).translationXBy(autoCompleteTextViewLocation[0]).alpha(0.5f).setDuration(700).withEndAction(new Runnable() {
             @Override
             public void run() {
-                ((TextView)findViewById(R.id.destination_text_view)).setText(autoCompleteTextView.getText());
+                String str_temp = autoCompleteTextView.getText().toString();
+                int commaCount = 0, i;
+                for (i = 0; i < str_temp.length(); i++) {
+                    if (str_temp.charAt(i) == ',')
+                        commaCount++;
+                    if (commaCount == 3)
+                        break;
+
+                }
+                ((TextView) findViewById(R.id.destination_text_view)).setText(str_temp.substring(0, i));
+
                 autoCompleteTextView.setVisibility(View.GONE);
                 findViewById(R.id.linear_layout_top).setVisibility(View.VISIBLE);
             }
@@ -262,5 +273,10 @@ public class MainActivity extends AppCompatActivity implements MainCallback{
         requestingLocationUpdates = false;
         stopLocationUpdates();
         startRendering();
+    }
+
+    @Override
+    public void onBackPressed() {
+
     }
 }

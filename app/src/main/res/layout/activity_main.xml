@@ -36,12 +36,18 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:onClick="backButtonOnClick"
-            android:src="@drawable/back_24" />
+            android:background="@android:color/transparent"
+            android:paddingLeft="10dp"
+            android:src="@drawable/baseline_clear_black_18dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="64dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textFontWeight="bold"
+            android:textColor="@color/colorPrimary"
             android:id="@+id/destination_text_view"
+            android:textSize="21sp"
             />
 
     </LinearLayout>
